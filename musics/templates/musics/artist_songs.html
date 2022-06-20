@@ -1,0 +1,25 @@
+{% extends '_base.html' %}
+{% load thumbnail %}
+
+{% block title %}{{ artist.name }}{% endblock title %}
+
+
+
+
+{% block content %}
+    <h1>{{ artist.name }}'s songs</h1>
+    <div class="container mt-9">
+        <p>
+            {% for song in songs %}
+                {% thumbnail song.cover "200x200" crop='center' as im %}
+                    <a href="{{ song.get_absolute_url }}"><img src="{{ im.url }}" width="{{ im.width }}"
+                                                            height="{{ im.height }}" alt="..."></a>
+                {% endthumbnail %}
+
+            {% endfor %}
+
+        </p>
+
+    </div>
+
+{% endblock content %}

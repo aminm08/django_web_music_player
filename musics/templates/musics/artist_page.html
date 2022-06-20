@@ -1,0 +1,36 @@
+{% extends '_base.html' %}
+
+
+
+
+
+{% block title %}artists{% endblock %}
+
+
+
+
+
+{% block content %}
+
+    <div class="container mt-9">
+        <h2>all artists</h2>
+
+            {% for artist in artists %}
+
+
+
+
+                <div>
+                    <a href="{% url 'artist_songs' artist.name %}">{{ artist.name }}</a>
+                </div>
+
+            {% endfor %}
+
+
+    </div>
+
+
+{% endblock content %}
+
+
+

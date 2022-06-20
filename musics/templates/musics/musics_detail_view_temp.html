@@ -1,0 +1,126 @@
+{% extends '_base.html' %}
+{% load thumbnail %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+
+{% block static %}
+    <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
+{% endblock static %}
+
+{% block title %} hello{% endblock %}
+
+
+{% block content %}
+    <div class=" container mt-9">
+        <div class="d-flex justify-content-center">
+            <div class="column mt-3 w-sm-75 ">
+                <div class="">
+                    {#                    {% if messages %}#}
+                    {##}
+                    {#                            {% for message in messages %}#}
+                    {#                                <script>#}
+                    {#                                    alert({{ message }});#}
+                    {#                                </script>#}
+                    {#                            {% endfor %}}#}
+                    {##}
+                    {#                    {% endif %}#}
+                    {% thumbnail music.cover "300x300" crop="center" as im %}
+                        <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="...">
+                    {% endthumbnail %}
+                </div>
+
+                <div>
+
+                    <h2 class="card-title">{{ music.title|capfirst }}</h2>
+                    <h3 class="card-text">By: <a
+                            href="{% url 'artist_songs'  music.Artist.name %}">{{ music.Artist.name }}</a></h3>
+                    <h5 class="card-text">{{ music.get_genres_display }}</h5>
+                    {% if music.instrument_used %}
+                        <h5 class="card-text">Instrument used: {{ music.get_instrument_used_display }}</h5>
+                    {% endif %}
+                    {% if music.Album %}
+                        <h5 class="card-text">album: <a href="{{ music.Album.get_absolute_url }}">{{ music.Album }}</a>
+                        </h5>
+
+                    {% endif %}
+
+                    <h5 class="card-text">views: {{ views }}</h5>
+
+
+                </div>
+                <div>
+                    <audio controls class="card-text">
+                        <source src="{{ music.audio.url }}" type="audio/mpeg">
+                    </audio>
+
+                </div>
+                <div>
+                    {% if user.is_authenticated %}
+
+                        <a href="{{ music.download_link }} " class="btn btn-primary">download</a>
+                    {% endif %}
+                </div>
+
+
+                <div style="text-align:-webkit-right;">
+                    {% if not isin %}
+                        <div style="align-content: baseline">
+
+
+                            <h3>{{ music.title }} is in <a href="{% url 'favorit_songs' %}">favorits</a></h3>
+                            {#                                <a href="{% url 'delete' music.pk %}" class="btn btn-danger"> Delete</a>a#}
+
+
+                        </div>
+                    {% else %}
+                        {% if user.is_authenticated %}
+
+
+                            <form method="post">
+                                {% csrf_token %}
+                                {{ form|crispy }}
+                                <button type="submit">add it to favorits</button>
+
+                            </form>
+                        {% else %}
+                            <p>login to add favorite & download feature</p>
+                            <a href="{% url 'login' %}" class="btn btn-success">Login</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div>
+                    {% if sugg %}
+
+                        <h3>suggestions for you</h3>
+                        {% for s in sugg %}
+                            {% thumbnail s.cover "250x250" crop="center" as im %}
+                                <a href="{{ s.get_absolute_url }}"><img src="{{ im.url }}" width="{{ im.width }}"
+                                                                        height="{{ im.height }}" alt="..."></a>
+                            {% endthumbnail %}
+
+                        {% endfor %}
+
+                    {% endif %}
+
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+{% endblock content %}
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
+
+
+{% endblock script %}

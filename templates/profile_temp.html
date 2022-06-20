@@ -1,0 +1,44 @@
+{% extends '_base.html' %}
+
+{% block title %}{{ user.username }}'s profile{% endblock title %}
+
+
+
+{% block content %}
+    <div>
+        <h1>{{ user.username }}'s profile</h1>
+
+        <ul>
+            {% if user.first_name %}
+                <li>first name:{{ user.first_name }}</li>
+
+            {% endif %}
+            {% if user.last_name %}
+
+                <li>last name:{{ user.last_name }}</li>
+            {% endif %}
+            {% if user.favorite_musics %}
+
+                <li>favorite music:{{ user.get_favorite_musics_display }}</li>
+            {% endif %}
+            {% if user.favorite_instrument %}
+
+                <li>favorite music:{{ user.get_favorite_instrument_display }}</li>
+            {% endif %}
+            <a href="{% url 'update_profile' user.pk %}" class="btn btn-info mt-3 mb-3">Edit profile</a>
+            <li><a href="{% url 'password_change' %}" class="btn btn-danger">change password</a></li>
+        </ul>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock content %}

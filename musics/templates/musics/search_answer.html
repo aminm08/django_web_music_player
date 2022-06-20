@@ -1,0 +1,54 @@
+{% extends '_base.html' %}
+{% load thumbnail %}
+
+{% block title %} hello{% endblock %}
+
+{% block search %}
+    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search">
+    <button class="btn btn-outline-success" type="submit">Search</button>
+{% endblock search %}
+
+
+{% block content %}
+
+
+    <div>
+
+        {% if song %}
+
+            <h1>you search answer</h1>
+
+            <p>
+                {% for a in song %}
+
+
+                    {% thumbnail a.cover "200x200" crop="center" as im %}
+                        <a href="{{ a.get_absolute_url }}"><img src="{{ im.url }}" width="{{ im.width }}"
+                                                                height="{{ im.height }}" alt="..."></a>
+                    {% endthumbnail %}
+
+
+
+                {% endfor %}
+            </p>
+        {% else %}
+            <h1>nothing found</h1>
+            <a href="{% url 'main_page' %}">Musics</a>
+        {% endif %}
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock content %}
+
+
+

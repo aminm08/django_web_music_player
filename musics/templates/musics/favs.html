@@ -1,0 +1,52 @@
+{% extends '_base.html' %}
+{% load thumbnail %}
+
+{% block title %} hello{% endblock %}
+
+
+{% block content %}
+
+    {% if user.is_authenticated %}
+        <h1>Your Favorite songs</h1>
+
+        <div>
+
+            <p>
+
+
+                {% for a in fav_song %}
+
+
+
+
+
+
+
+                    {#                        <h1>{{ a.song }}</h1>#}
+                    {#                        <h2>{{ a.user }}</h2>#}
+                    {#                        <h3>{{ a.is_favorit }}</h3>#}
+
+                    {% thumbnail a.cover "200x200" crop="center" as im %}
+                        <a href="{{ a.get_absolute_url }}"><img src="{{ im.url }}" width="{{ im.width }}"
+                                                                height="{{ im.height }}" alt="..."></a>
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" name="{{ a.id }}" value="Remove">Delete
+                            </button>
+                        </form>
+
+
+
+                    {% endthumbnail %}
+
+
+
+
+                {% endfor %}
+            </p>
+
+        </div>
+
+
+    {% endif %}
+{% endblock content %}

@@ -1,0 +1,115 @@
+{% extends '_base.html' %}
+{% load thumbnail %}
+
+
+{% load static %}
+
+{% block title %} hello{% endblock %}
+
+{% block search %}
+    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search">
+    <button class="btn btn-outline-success" type="submit">Search</button>
+{% endblock search %}
+
+
+{% block content %}
+    <div class="container mt-9">
+        <h2>instruments</h2>
+        <p class="mt-3">
+
+
+            <a href="{% url 'instruments' 'piano' %}"><img src="{% static 'icons/piano.jfif' %}" width="200" height="200"
+                                             alt=""></a>
+
+
+            <a href="{% url 'instruments' 'violin' %}"><img src="{% static 'icons/violin.png' %}" width="200" height="200" alt=""></a>
+
+
+            <a href="{% url 'instruments' 'guitar' %}"><img src="{% static 'icons/guitar.png' %}" width="200" height="200" alt=""></a>
+
+            <a href="{% url 'instruments' 'flute' %}"><img src="{% static 'icons/flute.png' %}" width="200" height="200"
+                                             alt=""></a>
+
+        </p>
+
+    </div>
+
+    <div class="container mt-9">
+        <h2>categories</h2>
+        <p class="mt-3">
+
+
+            <a href="{% url 'genres' 'pop' %}"><img src="{% static 'icons/pop.png' %}" width="200" height="200"
+                                           alt=""></a>
+
+
+            <a href="{% url 'genres' 'rock' %}"><img src="{% static 'icons/rock.png' %}" width="200" height="200" alt=""></a>
+
+
+            <a href="{% url 'genres' 'hiphop' %}"><img src="{% static 'icons/hiphop.jfif' %}" width="200" height="200"
+                                              alt=""></a>
+
+            <a href="{% url 'genres' 'classic' %}"><img src="{% static 'icons/classic.png' %}" width="200" height="200"
+                                               alt=""></a>
+
+        </p>
+    </div>
+    {% if random_sugg %}
+
+        <div class="container mt-9">
+            <h2>for you</h2>
+            <p class="mt-3 mb-3">
+                {% for rand in random_sugg %}
+                    {% thumbnail rand.cover "200x200" crop="center" as im %}
+                        <a href="{{ rand.get_absolute_url }}"><img src="{{ im.url }}" width="{{ im.width }}"
+                                                                   height="{{ im.height }}" alt="..."></a>
+                    {% endthumbnail %}
+
+                {% endfor %}
+            </p>
+
+        </div>
+    {% endif %}
+
+    <div class="container mt-9">
+        <h2>top songs</h2>
+        <p class="mt-3 mb-3">
+            {% for music in up_rates %}
+
+
+
+
+                {% thumbnail music.cover "200x200" crop="center" as im %}
+                    <a href="{{ music.get_absolute_url }}"><img src="{{ im.url }}" width="{{ im.width }}"
+                                                                height="{{ im.height }}" alt="..."></a>
+                {% endthumbnail %}
+
+
+
+            {% endfor %}
+        </p>
+
+    </div>
+    <div class="container mt-9">
+        <h2>random songs</h2>
+        <p class="mt-3">
+            {% for m in random %}
+
+
+
+                {% thumbnail m.cover "200x200" crop="center" as im %}
+                    <a href="{{ m.get_absolute_url }}"><img src="{{ im.url }}" width="{{ im.width }}"
+                                                            height="{{ im.height }}" alt="..."></a>
+                {% endthumbnail %}
+
+            {% endfor %}
+        </p>
+
+    </div>
+
+
+
+{% endblock content %}
+
+
+

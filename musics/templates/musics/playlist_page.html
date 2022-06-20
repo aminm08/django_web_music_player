@@ -1,0 +1,48 @@
+{% extends '_base.html' %}
+{% load thumbnail %}
+
+{% block title %} hello{% endblock %}
+
+
+{% block content %}
+
+    <div>
+
+        {% if playlist %}
+
+            <h1>Playlists</h1>
+            <a href="{% url 'add_playlist' %}" class="btn btn-info">Add playlist</a>
+
+
+
+            {% for a in playlist %}
+
+
+                <h1><a href="{% url 'playlist_songs' a.playlist_name %}">{{ a.playlist_name }}</a></h1>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger" name="{{ a.pk }}">Delete</button>
+
+                </form>
+
+               ______________________________
+
+
+
+            {% endfor %}
+        {% else %}
+            <h1>no playlist to show</h1>
+            <a href="{% url 'add_playlist' %}" class="btn btn-info">Add playlist</a>
+        {% endif %}
+    </div>
+
+
+
+
+
+
+
+
+
+
+{% endblock content %}

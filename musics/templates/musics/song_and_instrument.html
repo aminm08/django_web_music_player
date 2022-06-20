@@ -1,0 +1,36 @@
+{% extends '_base.html' %}
+{% load thumbnail %}
+
+{% block title %}{{ catg }}{% endblock title %}
+
+
+
+{% block content %}
+    <h1>{{ catg }}</h1>
+    <div class="container mt-9">
+        <p>
+            {% for m in page_obj %}
+                {% thumbnail m.cover "200x200" crop='center' as im %}
+                    <a href="{{ m.get_absolute_url }}"><img src="{{ im.url }}" width="{{ im.width }}"
+                                                            height="{{ im.height }}" alt="..."></a>
+                {% endthumbnail %}
+
+            {% endfor %}
+
+        </p>
+
+    </div>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+            {% endif %}
+            <li class="page-item"><p class="page-link">page {{ page_obj.number }}</p></li>
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+{% endblock content %}

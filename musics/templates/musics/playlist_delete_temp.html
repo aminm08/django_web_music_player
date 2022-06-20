@@ -1,0 +1,28 @@
+{% extends '_base.html' %}
+{% load thumbnail %}
+
+{% block title %} hello{% endblock %}
+
+
+{% block content %}
+
+    <div>
+        <h1>Are you sure you want to delete {{ playlist.playlist_name }}</h1>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes Im Sure</button>
+        </form>
+        <a href="{% url 'playlists'%}" class="btn btn-success">Cancle</a>
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+{% endblock content %}

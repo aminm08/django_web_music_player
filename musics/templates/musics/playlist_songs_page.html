@@ -1,0 +1,35 @@
+{% extends '_base.html' %}
+{% load thumbnail %}
+
+{% block title %} hello{% endblock %}
+
+
+{% block content %}
+
+    <div>
+        {% if songs %}
+
+            <a href="{% url 'add_playlist_song' playlist.pk %}" class="btn btn-info mt-3">add song</a>
+
+            <h1>{{ playlist_name }}</h1>
+            {% for song in songs %}
+                <h3>{{ song.song_name }}</h3>
+                <audio controls>
+                    <source src="{{ song.audios.url }}" type="audio/mpeg">
+                </audio>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger" name="{{ song.pk }}">Delete</button>
+                </form>
+            {% endfor %}
+        {% else %}
+            <h2>there are'nt any song in this playlist</h2>
+            <a href="{% url 'add_playlist_song' playlist.pk %}" class="btn btn-info">add song</a>
+
+        {% endif %}
+
+
+    </div>
+
+
+{% endblock content %}
