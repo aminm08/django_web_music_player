@@ -35,15 +35,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #apps
     'accounts',
     'musics',
+    #third party packages
     'crispy_forms',
     'crispy_bootstrap5',
     'sorl.thumbnail',
+    'allauth',
+    'allauth.account',
 
 
 
 ]
+
+SITE_ID = 1
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -106,6 +113,19 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+    # `allauth`
+    'allauth.account.auth_backends.AuthenticationBackend',
+
+]
+
+
+
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -142,6 +162,14 @@ LOGIN_REDIRECT_URL = 'main_page'
 LOGOUT_REDIRECT_URL = 'main_page'
 # restore password email config
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#allauth
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+
 
 # some settings
 # DEBUG = False

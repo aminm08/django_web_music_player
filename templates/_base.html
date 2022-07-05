@@ -64,10 +64,10 @@
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             {% if user.is_authenticated %}
 
-                                <li><a href="{% url 'logout' %}" class="dropdown-item"><h3>Logout</h3></a></li>
+                                <li><a href="{% url 'account_logout' %}" class="dropdown-item"><h3>Logout</h3></a></li>
                             {% else %}
-                                <li><a href="{% url 'login' %}" class="dropdown-item"><h3>Login</h3></a></li>
-                                <li><a href="{% url 'signup' %}" class="dropdown-item"><h3>Signup</h3></a></li>
+                                <li><a href="{% url 'account_login' %}" class="dropdown-item"><h3>Login</h3></a></li>
+                                <li><a href="{% url 'account_signup' %}" class="dropdown-item"><h3>Signup</h3></a></li>
                             {% endif %}
 
                         </ul>
