@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
 {% endblock static %}
 
-{% block title %} hello{% endblock %}
+{% block title %} Music|{{music.title }}{% endblock %}
 
 
 {% block content %}
@@ -16,15 +16,7 @@
         <div class="d-flex justify-content-center">
             <div class="column mt-3 w-sm-75 ">
                 <div class="">
-                    {#                    {% if messages %}#}
-                    {##}
-                    {#                            {% for message in messages %}#}
-                    {#                                <script>#}
-                    {#                                    alert({{ message }});#}
-                    {#                                </script>#}
-                    {#                            {% endfor %}}#}
-                    {##}
-                    {#                    {% endif %}#}
+
                     {% thumbnail music.cover "300x300" crop="center" as im %}
                         <img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="...">
                     {% endthumbnail %}

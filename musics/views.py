@@ -242,6 +242,7 @@ def album_detail_view(request, pk):
 @login_required()
 @permission_required('can_add_album',raise_exception=True)
 def album_add_view(request):
+
     if request.method == 'POST':
         form = AlbumForm(request.POST)
         if form.is_valid():
@@ -249,7 +250,7 @@ def album_add_view(request):
             return redirect('albums')
     else:
         form = AlbumForm()
-    return render(request,'musics/add_music_page.html',{'form':form})
+    return render(request,'musics/add_album_page.html',{'form':form})
 #=========================================
 def artist_view(request):
     artists = Artists.objects.all()
@@ -262,7 +263,7 @@ def artist_view(request):
     return render(request, 'musics/artist_page.html', {'artists':artists})
 #========================
 @login_required()
-@permission_required('can_add_artist',raise_exception=True)
+@permission_required('can_add_artists',raise_exception=True)
 def artist_add_view(request):
     if request.method == 'POST':
         form = ArtistForm(request.POST)
