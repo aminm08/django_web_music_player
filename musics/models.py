@@ -21,7 +21,7 @@ class Music(models.Model):
         ('eng', 'english'),),
         max_length=3, blank=True)
     audio = models.FileField(upload_to='audios/', blank=True)
-    cover = ImageField(upload_to='covers/', blank=True)
+    cover = ImageField(upload_to='music_covers/', blank=True)
     download_link = models.CharField(max_length=100)
     rating = models.IntegerField(choices=RATING_CHOICES, default=1)
     genres = models.CharField(choices=CustomUser.MUSIC_CATG_CHOICES, max_length=2, default=1)
@@ -34,6 +34,7 @@ class Music(models.Model):
 
     def get_absolute_url(self):
         return reverse('detail_view', args=[self.id])
+
 
 
 class Favorits(models.Model):
@@ -72,6 +73,7 @@ class Album(models.Model):
 
     def __str__(self):
         return self.Album_name
+
 
 
 class AlbumSongs(models.Model):

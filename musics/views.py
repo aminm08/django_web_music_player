@@ -1,20 +1,19 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,permission_required
 from django.shortcuts import get_object_or_404
-from django.contrib import messages
 from django.db.models import Q
 from django.conf import settings
 from django.core.paginator import Paginator
-from accounts.models import CustomUser
 from ipware import get_client_ip
-from random import randint
-from .decorators import user_passes_test,check_user_and_adder
+from django.contrib.auth import get_user_model
+
 
 import os
 
 from .forms import *
 from .models import *
-
+from .decorators import user_passes_test
+from .toolfuncs import pick_random,check_user_and_adder,check_fav_list,add_user_to_group
 
 
 
@@ -23,14 +22,17 @@ def main_page_view(request):
     word = ''
     random_suggestion = []
     all_musics = Music.objects.all() # all songs
-    random_musics = pick_random(all_musics,5) # geting random songs pick_random is a function wich has been  defined in the bottom
+    add_user_to_group()
+    # geting random songs pick_random is a function wich has been  defined in the bottom
+    random_musics = pick_random(all_musics,5)
     up_rates = Music.objects.filter(rating=5)
-
-    if request.user.is_authenticated:  # if user is authenticated we will show some suggestions by his favorites wich had choosed in the authenticatipn
-        user = CustomUser.objects.get(username=request.user) # finding the user
-        sugg = Music.objects.filter(instrument_used=user.favorite_instrument,genres=user.favorite_musics)
-        random_suggestion = pick_random(sugg,5) # pick 5 song from suggestion there might be less than 5 , so we will show 5 or less
-        # if user search something
+    # if user is authenticated we will show some suggestions by its favorites which had chosen in the authentication
+    if request.user.is_authenticated:
+        user = get_user_model().objects.get(username=request.user) # finding the user
+        suggestions = Music.objects.filter(instrument_used=user.favorite_instrument,genres=user.favorite_musics)
+        # pick 5 song from suggestion there might be less than 5 , so we will show 5 or less
+        random_suggestion = pick_random(suggestions,5)
+    # if user search something
     if request.method == 'POST':
         word = request.POST.get('search')
         return redirect('search', word=word)
@@ -40,19 +42,6 @@ def main_page_view(request):
                            'up_rates': up_rates,
                            'random_sugg': random_suggestion})
 #-=====================================================================
-def pick_random(musics,num):
-    random_musics = []
-    if len(musics) >num:
-        while len(random_musics)!=num: # getting random songs ,you can change the number (3) based on number of songs you have in site
-
-            number = randint(0,len(musics)-1)  # i started from 0 because our songs are in a list and it starts from 0 and len(all)-1 for the same reason
-            if musics[number] not in random_musics:
-                random_musics.append(musics[number])
-        return random_musics
-    else:
-        return musics
-#=======================================================
-
 def music_detail_view(request, pk):  # any user can access detail view
     random_sugg = []
     # it gets the user ip adr
@@ -61,30 +50,35 @@ def music_detail_view(request, pk):  # any user can access detail view
     music = get_object_or_404(Music, pk=pk)
     all = Music.objects.all()
     #==================VIEWS MANAGMENT==========
-    if len(View.objects.all())!=0 : # to prevent eror when there's no object of this model(no view for the song)
-        all_user_views = View.objects.filter(Q(user=request.user)|Q(ip=ip),song=music)# cheking if this user has any views of this song
-        if len(all_user_views) == 0:# if this user has no view for this song we can add the view wich means th user is uniqe
+    # to prevent eror when there's no object of this model(no view for the song)
+    if len(View.objects.all())!=0 :
+        # cheking if this user has any views of this song
+        all_user_views = View.objects.filter(Q(user=request.user)|Q(ip=ip),song=music)
+        # if this user has no view for this song we can add the view wich means th user is uniqe
+        if len(all_user_views) == 0:
             View.objects.create(user=request.user,ip=ip,song=music)
-    else:
+    else:# we add the view if views are 0
         View.objects.create(user=request.user, ip=ip, song=music)
-    music_views = View.objects.filter(song=music) # getting views for the music
+    # getting views for the music
+    music_views = View.objects.filter(song=music)
 
     #=============SUGGESTION MANAGMENT==================
-
+    # suggest some songs that are not duplicated from songs when user is authenticated
     if request.user.is_authenticated:
-        sugg = [i for i in Music.objects.filter(Q(Artist=music.Artist)|Q(genres=music.genres)) if i.title != music.title]#getting the user's suggestions
-        if len(sugg) <3 and len(sugg) != 0:
-            random_sugg = pick_random(all,3) # we will pick from all if the music suggs are less than 3
+        suggestions = [i for i in Music.objects.filter(Q(Artist=music.Artist)|Q(genres=music.genres)) if i.title != music.title]#getting the user's suggestions
+        if len(suggestions) <3 and len(suggestions) != 0:
+            # we will pick from all if the music suggs are less than 3
+            random_suggestions = pick_random(all,3)
+        # chosing random songs from suggesstions
+        if len(suggestions) >=3:
+            random_suggestions = pick_random(suggestions,3)
 
-        if len(sugg) >=3:
-            random_sugg = pick_random(sugg,3)#chosing random songs from sugg
-
-
-
-    if request.method == 'POST' and request.user.is_authenticated:  # to add the song to favorits only for authenticated users
+    # to add the song to favorits only for authenticated users
+    if request.method == 'POST' and request.user.is_authenticated:
         form = FavForm(request.POST)
         if form.is_valid():
-            if check_fav_list(request, music):  # checks if the song is already in the favorites list
+            # checks if the song is already in the favorites list
+            if check_fav_list(request, music):
                 is_fav = form.save(commit=False)
                 is_fav.user = request.user
                 is_fav.song = music
@@ -93,30 +87,25 @@ def music_detail_view(request, pk):  # any user can access detail view
         form = FavForm()
 
     return render(request, 'musics/musics_detail_view_temp.html',
-                  {'music': music, 'form': form, 'isin': check_fav_list(request, music),'sugg':random_sugg,'views':len(music_views)})
-#======================================================================================
-
-# checks if the music is in favorite list or not
-def check_fav_list(request, music):
-    # return true for anonymous user we prevented showing the form to anonymoususer in template
-    if not request.user.is_authenticated:
-        return True
-    # getting favorite songs of this user
-    songs = Favorits.objects.filter(user=request.user)
-    # ckeks if that favorite list has any song or not
-    if len(songs) != 0:
-        for i in songs:
-            if str(i.song) == music.title and i.user == request.user and i.is_favorit == True:
-                # it means the song is in favorits so we send false to make the if statement in detail view  false
-                return False
-        # else for {for} it means that there is no song with these infos in favorite list
-        else:
-            return True
-    # returns true if there's no song in favorite list
+                  {'music': music,
+                   'form': form,
+                   'isin': check_fav_list(request, music),
+                   'sugg':random_sugg,'views':len(music_views)
+                   })
+#=======================================
+@login_required()
+@permission_required('can_add_music',raise_exception=True)
+def music_add_view(request):
+    if request.method == 'POST':
+        form = MusicForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('all_songs')
     else:
-        return True
+        form = MusicForm()
+    return render(request,'musics/add_music_page.html',{'form':form})
 
-#====================================================
+#======================================
 @login_required()
 def favorit_songs(request):
     songs = Music.objects.filter(favorits__user=request.user, favorits__is_favorit=True).distinct()
@@ -142,7 +131,6 @@ def all_user_playlists(request):
     return render(request, 'musics/playlist_page.html', {'playlist': playlists})
 
 #==========================================
-
 @user_passes_test(check_user_and_adder,model_obj=PlayList,raise_exception=True,url_input_obj_name='pk')
 #delete the playlist object by pk
 def all_user_playlist_delete_view(request,pk):
@@ -187,9 +175,9 @@ def play_list_add(request):
     return render(request, 'musics/add_playlist_temp.html', {'form': form})
 #=================================================================
 @login_required()
-@user_passes_test(check_user_and_adder,raise_exception=True,url_input_obj_name='pk')
-def play_list_song_add(request, pk):
-    playlist = get_object_or_404(PlayList, pk=pk)
+@user_passes_test(check_user_and_adder,raise_exception=True,url_input_obj_name='playlist_name',model_obj=PlayList)
+def play_list_song_add(request, playlist_name):
+    playlist = get_object_or_404(PlayList, playlist_name=playlist_name)
     if request.method == "POST":
         form = PlaylistSongsForm(request.POST)
         if form.is_valid():
@@ -244,13 +232,24 @@ def album_list_view(request):
         return redirect('search', word=word)
 
     return render(request, 'musics/album_list_view_temp.html', {'page_obj':page_obj})
-    #===============================================================
+ #===============================================================
 
 def album_detail_view(request, pk):
     album = get_object_or_404(Album, pk=pk)
     songs = AlbumSongs.objects.filter(Album=album)
     return render(request, 'musics/album_detail_view_temp.html', {'album': album, 'songs': songs})
-
+#==========================================
+@login_required()
+@permission_required('can_add_album',raise_exception=True)
+def album_add_view(request):
+    if request.method == 'POST':
+        form = AlbumForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('albums')
+    else:
+        form = AlbumForm()
+    return render(request,'musics/add_music_page.html',{'form':form})
 #=========================================
 def artist_view(request):
     artists = Artists.objects.all()
@@ -261,17 +260,23 @@ def artist_view(request):
             print('enter somthing')
         return redirect('search', word=word)
     return render(request, 'musics/artist_page.html', {'artists':artists})
+#========================
+@login_required()
+@permission_required('can_add_artist',raise_exception=True)
+def artist_add_view(request):
+    if request.method == 'POST':
+        form = ArtistForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('artists')
+    else:
+        form = ArtistForm()
+    return render(request,'musics/add_artist_page.html',{'form':form})
 
 #==========================================
-@login_required()
-def profile_view(request):
-
-    return render(request, 'profile_temp.html')
-    # instrumental orginize
-#=======================================
-
 # categories views
 def genres_view(request,name):
+
     musics = Music.objects.filter(genres=name[:2])
     #paginator configuration
     paginator = Paginator(musics, 10)
@@ -280,8 +285,6 @@ def genres_view(request,name):
     # if user search something
     if request.method == 'POST':
         word = request.POST.get('search')
-        if word == '':
-            print('enter somthing')
         return redirect('search', word=word)
 
     return render(request,'musics/song_and_instrument.html',{'page_obj':page_obj,'catg':name})
@@ -295,17 +298,11 @@ def instrument_view(request,name):
     # if user search something
     if request.method == 'POST':
         word = request.POST.get('search')
-        if word == '':
-            print('enter somthing')
         return redirect('search', word=word)
 
     return render(request,'musics/song_and_instrument.html',{'page_obj':page_obj,'catg':name})
-#+=======================================
-
-
 # by language
-
-
+#+=======================================
 def english_songs(request):
     musics = Music.objects.filter(language='eng').order_by('-rating','-view_number')
 
@@ -318,24 +315,11 @@ def farsi_songs(request):
     return render(request, 'musics/song_and_instrument.html', {'music': musics, 'catg': 'farsi'})
 #==================================================
 
-
-#artist
+#artist songs
 def artist_songs_view(request,artist):
     Artist = get_object_or_404(Artists,name=artist)
     songs = Music.objects.filter(Artist=Artist)
 
     return render(request, 'musics/artist_songs.html', {'artist':Artist, 'songs':songs})
-
-
-
 #==================================================
-
-def contact_view(request):
-
-    return render(request,'contactus_page.html')
-
-#==================================================
-def about_view(request):
-
-    return render(request,'aboutus_page.html')
 

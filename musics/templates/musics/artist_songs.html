@@ -19,7 +19,10 @@
             {% endfor %}
 
         </p>
+    {% if user.is_staff %}
+        <a href="{% url 'add_music' %}" class="btn btn-info">add song</a>
 
+    {% endif %}
     </div>
 
 {% endblock content %}

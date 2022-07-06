@@ -22,14 +22,3 @@ def user_passes_test(
 
     return decorator
 
-# the test func for the above decorator
-def check_user_and_adder(user,model_object,url_info): # url_info_containts the kwargs
-
-    url_object_name = list(url_info.keys())[0]
-    url_object_value = url_info.get(url_object_name)
-    # get the object depended on url variable name
-    if url_object_name == 'pk':
-        obj = get_object_or_404(model_object,pk=url_object_value)
-    elif url_object_name == 'playlist_name':
-        obj = get_object_or_404(model_object,playlist_name=url_object_value)
-    return user == obj.user # true if this user is the same user in DB

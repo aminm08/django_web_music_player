@@ -9,7 +9,7 @@
     <div>
         {% if songs %}
 
-            <a href="{% url 'add_playlist_song' playlist.pk %}" class="btn btn-info mt-3">add song</a>
+            <a href="{% url 'add_playlist_song' playlist.playlist_name %}" class="btn btn-info mt-3">add song</a>
 
             <h1>{{ playlist_name }}</h1>
             {% for song in songs %}
@@ -24,7 +24,7 @@
             {% endfor %}
         {% else %}
             <h2>there are'nt any song in this playlist</h2>
-            <a href="{% url 'add_playlist_song' playlist.pk %}" class="btn btn-info">add song</a>
+            <a href="{% url 'add_playlist_song' playlist.playlist_name %}" class="btn btn-info">add song</a>
 
         {% endif %}
 

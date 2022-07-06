@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     #apps
     'accounts',
     'musics',
+    'pages',
     #third party packages
     'crispy_forms',
     'crispy_bootstrap5',

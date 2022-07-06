@@ -32,5 +32,9 @@
             {% endif %}
         </ul>
     </nav>
+    {% if user.is_staff %}
+        <a href="{% url 'add_music' %}" class="btn btn-info">add song</a>
+
+    {% endif %}
 
 {% endblock content %}

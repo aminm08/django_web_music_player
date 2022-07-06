@@ -30,6 +30,10 @@
 
             {% endfor %}
         </p>
+    {% if user.is_staff %}
+        <a href="{% url 'add_album' %}" class="btn btn-info">add album</a>
+
+    {% endif %}
 
     </div>
 

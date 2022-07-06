@@ -26,7 +26,10 @@
 
             {% endfor %}
 
+        {% if user.is_staff %}
+        <a href="{% url 'add_artist' %}" class="btn btn-info">add artist</a>
 
+    {% endif %}
     </div>
 
 
